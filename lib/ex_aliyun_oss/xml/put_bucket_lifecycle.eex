@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LifecycleConfiguration>
+  <Rule>
+    <ID><%= var_put_bucket_lifecycle.rule_id %></ID>
+    <Prefix><%= var_put_bucket_lifecycle.prefix %></Prefix>
+    <Status><%= var_put_bucket_lifecycle.status %></Status>
+
+    <%= if var_put_bucket_lifecycle.expiration != nil do %>
+    <Expiration>
+      <%= cond do %>
+        <% var_put_bucket_lifecycle.expiration.days != nil -> %>
+          <Days><%= var_put_bucket_lifecycle.expiration.days %></Days>
+        <% var_put_bucket_lifecycle.expiration.created_before_date != nil -> %>
+          <CreatedBeforeDate><%= var_put_bucket_lifecycle.expiration.created_before_date %></CreatedBeforeDate>
+      <% end %>
+    </Expiration>
+    <% end %>
+
+    <%= if var_put_bucket_lifecycle.transition != nil do %>
+    <Transition>
+      <%= cond do %>
+        <% var_put_bucket_lifecycle.transition.days != nil -> %>
+          <Days><%= var_put_bucket_lifecycle.transition.days %></Days>
+        <% var_put_bucket_lifecycle.transition.created_before_date != nil -> %>
+          <CreatedBeforeDate><%= var_put_bucket_lifecycle.transition.created_before_date %></CreatedBeforeDate>
+      <% end %>
+      <%= if var_put_bucket_lifecycle.transition.storage_class != nil do %>
+        <StorageClass><%= var_put_bucket_lifecycle.transition.storage_class %></StorageClass>
+      <% end %>
+    </Transition>
+    <% end %>
+
+    <%= if var_put_bucket_lifecycle.abort_multipart_upload != nil do %>
+    <AbortMultipartUpload>
+      <%= cond do %>
+        <% var_put_bucket_lifecycle.abort_multipart_upload.days != nil -> %>
+          <Days><%= var_put_bucket_lifecycle.abort_multipart_upload.days %></Days>
+        <% var_put_bucket_lifecycle.abort_multipart_upload.created_before_date != nil -> %>
+          <CreatedBeforeDate><%= var_put_bucket_lifecycle.abort_multipart_upload.created_before_date %></CreatedBeforeDate>
+      <% end %>
+    </AbortMultipartUpload>
+    <% end %>
+  </Rule>
+</LifecycleConfiguration>
