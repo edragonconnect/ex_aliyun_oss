@@ -10,7 +10,8 @@ defmodule ExAliyunOssTest do
     PutBucketLifecycle.Expiration,
     PutObject,
     CopyObject,
-    DeleteObject
+    DeleteObject,
+    GetObject
   }
 
   require Region
@@ -115,7 +116,7 @@ defmodule ExAliyunOssTest do
       region: Region.cn_hangzhou()
     }
 
-    result = Client.get_object(@oss_account, oss_get_object, with_external_endpoint)
+    result = Client.get_object(@account, oss_get_object)
 
     {:ok, response} = result
     assert response.status_code == 200
@@ -324,7 +325,7 @@ defmodule ExAliyunOssTest do
     delete_result = Client.delete_bucket(@account, @bucket_name, Region.cn_hangzhou())
     Logger.info("delete_bucket result: #{inspect(delete_result, pretty: true)}")
     {:ok, response} = delete_result
-    assert String.contains?(response.body, "The bucket you tried to delete is not empty") == true
+    assert String.contains?(response.body, "The bucket has objects. Please delete them first.") == true
     assert response.status_code != 200
   end
 end

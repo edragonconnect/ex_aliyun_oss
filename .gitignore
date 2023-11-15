@@ -24,3 +24,4 @@ erl_crash.dump
 *.sublime-project
 *.sublime-workspace
 *.iml
+config
