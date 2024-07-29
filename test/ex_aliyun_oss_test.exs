@@ -127,6 +127,21 @@ defmodule ExAliyunOssTest do
     assert is_binary(response.body) == true
   end
 
+  test "get object meta" do
+    object_name = "/201711/1/1.txt"
+
+    oss_get_object = %GetObject{
+      object_name: object_name,
+      bucket_name: @bucket_name,
+      region: Region.cn_hangzhou()
+    }
+
+    result = Client.get_object_meta(@account, oss_get_object)
+
+    {:ok, response} = result
+    assert response.status_code == 200
+  end
+
   test "copy object" do
     path_to_local_file = "#{File.cwd!()}/test/data/upload_text.txt"
     file_binary = File.read!(path_to_local_file)

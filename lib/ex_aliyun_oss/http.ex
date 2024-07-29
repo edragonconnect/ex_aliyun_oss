@@ -45,21 +45,18 @@ defmodule ExAliyunOss.Http.Middleware do
     Tesla.put_headers(env, Enum.into(updated_headers, []))
   end
 
-  defp config_endpoint(env, request, uri, true) do
-    endpoint = Client.external_endpoint(request)
-    url = "#{endpoint}#{Client.encode_resource(uri)}"
+  defp config_endpoint(env, request, uri, external?) do
+    url =
+      if external? do
+        "#{Client.external_endpoint(request)}#{Client.encode_resource(uri)}"
+      else
+        "#{Client.internal_endpoint(request)}#{Client.encode_resource(uri)}"
+      end
+
     Map.put(env, :url, url)
   end
 
-  defp config_endpoint(env, request, uri, false) do
-    endpoint = Client.internal_endpoint(request)
-    url = "#{endpoint}#{Client.encode_resource(uri)}"
-    Map.put(env, :url, url)
-  end
-
-  defp oss_headers_to_str([]) do
-    ""
-  end
+  defp oss_headers_to_str([]), do: ""
 
   defp oss_headers_to_str(headers) do
     headers
@@ -82,23 +79,17 @@ defmodule ExAliyunOss.Http.Middleware do
     response = %Response{
       request_url: env.url,
       status_code: env.status,
+      headers: env.headers,
       body: env.body
     }
 
     updated_response =
       Enum.reduce(env.headers, response, fn item, acc ->
         case item do
-          {"date", date} ->
-            Map.put(acc, :date, date)
-
-          {"x-oss-request-id", request_id} ->
-            Map.put(acc, :request_id, request_id)
-
-          {"x-oss-server-time", server_time} ->
-            Map.put(acc, :server_time, server_time)
-
-          _ ->
-            acc
+          {"date", date} -> Map.put(acc, :date, date)
+          {"x-oss-request-id", request_id} -> Map.put(acc, :request_id, request_id)
+          {"x-oss-server-time", server_time} -> Map.put(acc, :server_time, server_time)
+          _ -> acc
         end
       end)
 
@@ -121,25 +112,11 @@ defmodule ExAliyunOss.Http do
     ])
   end
 
-  def send(http_client, "PUT") do
-    request(http_client, method: :put)
-  end
-
-  def send(http_client, "POST") do
-    request(http_client, method: :post)
-  end
-
-  def send(http_client, "GET") do
-    request(http_client, method: :get)
-  end
-
-  def send(http_client, "HEAD") do
-    request(http_client, method: :head)
-  end
-
-  def send(http_client, "DELETE") do
-    request(http_client, method: :delete)
-  end
+  def send(http_client, "PUT"), do: request(http_client, method: :put)
+  def send(http_client, "POST"), do: request(http_client, method: :post)
+  def send(http_client, "GET"), do: request(http_client, method: :get)
+  def send(http_client, "HEAD"), do: request(http_client, method: :head)
+  def send(http_client, "DELETE"), do: request(http_client, method: :delete)
 
   def send(_http_client, unknown_method) do
     raise ExAliyunOss.Error, "Invalid http method: #{inspect(unknown_method)}"

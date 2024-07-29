@@ -44,6 +44,19 @@ defmodule ExAliyunOss.Client.Object do
     }
   end
 
+  def request_to_get_object_meta(var) do
+    verified_object_name = verify_object_name(var.object_name)
+
+    %Request{
+      method: HttpMethod.head(),
+      resource: "/#{var.bucket_name}#{verified_object_name}",
+      body: "",
+      region: var.region,
+      bucket_name: var.bucket_name,
+      supplement: %{object_name: verified_object_name}
+    }
+  end
+
   def request_to_copy_object(var) do
     # since may copy from an object name with an encoded name (e.g contain Chinese character),
     # so try to decode in the first to avoid double encode uri with the encoded uri when send the final request.

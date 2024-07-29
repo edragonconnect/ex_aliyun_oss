@@ -28,6 +28,7 @@ defmodule ExAliyunOss.Response do
             request_id: nil,
             server_time: nil,
             status_code: nil,
+            headers: nil,
             body: "",
             date: nil
 end
